@@ -22,6 +22,7 @@ else()
     add_library(tinyply STATIC source/tinyply.cpp source/tinyply.h)
 endif()
 
+set_target_properties(tinyply PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set(BUILD_TESTS false CACHE BOOL "Build tests")
 
 # Example Application

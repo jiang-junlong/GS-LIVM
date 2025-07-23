@@ -4,7 +4,10 @@ option(BUILD_GS "option for build 3DGS" ON)
 
 if(BUILD_GS)
   if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-    set(CMAKE_CUDA_ARCHITECTURES "80;86;90")
+    set(CMAKE_CUDA_ARCHITECTURES "89")
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
   endif()
 
   project(gslivm LANGUAGES CUDA CXX)
@@ -15,21 +18,7 @@ else()
 endif()
 
 set(CMAKE_BUILD_TYPE "Release")
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-add_definitions(-O3)
-
-if(BUILD_GS)
-  set(CMAKE_CUDA_STANDARD 17)
-  set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-  set(CMAKE_CUDA_EXTENSIONS OFF)
-endif()
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
-
-add_definitions(-DROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -G -lineinfo --expt-relaxed-constexpr --expt-extended-lambda")
 
 option(USE_LIVOX "option for livox" ON)
 if(USE_LIVOX)
@@ -78,6 +67,7 @@ find_package(Sophus REQUIRED)
 find_package(tsl-robin-map REQUIRED)
 
 if(BUILD_GS)
+  enable_language(CUDA)
   find_package(CUDAToolkit REQUIRED)
 endif()
 
@@ -92,6 +82,7 @@ endif()
 catkin_package(
   CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy std_msgs
   DEPENDS EIGEN3
+  LIBRARIES ${PROJECT_NAME}.common
 )
 
 if(BUILD_GS)
@@ -114,19 +105,15 @@ include_directories(
 include_directories(
   ${CUDAToolkit_INCLUDE_DIRS}
 )
-
 # common
 add_library(${PROJECT_NAME}.common 
   src/common/timer/timer.cc
 )
 
 if(BUILD_GS)
-  include("${PROJECT_SOURCE_DIR}/cmake/torch.cmake")
-
-  list(APPEND CMAKE_PREFIX_PATH ${TORCH_CMAKE_PREFIX_PATH}
-    $ENV{CMAKE_PREFIX_PATH})
+  set(Torch_DIR /home/jiang/envs/libtorch-cu118/share/cmake/Torch)
   find_package(Torch REQUIRED)
-  add_subdirectory(external)
+  add_subdirectory(external) # 编译一些外部库
 
   set(gs_libs
     ${TORCH_LIBRARIES}
@@ -139,7 +126,6 @@ if(BUILD_GS)
     CUDA::cusolver
     Threads::Threads
     args
-    cnpy
   )
 
   include_directories(${TORCH_INCLUDE_DIRS})
@@ -195,35 +181,14 @@ add_executable(livo_node
 		src/liw/parameters.cpp
     src/liw/cudaMatrixMultiply.cpp)
 
-target_link_libraries(livo_node ${catkin_LIBRARIES} ${PROJECT_NAME}.common ${PROJECT_NAME}.gs ${PROJECT_NAME}.gp3d ${CERES_LIBRARIES} ${OpenCV_LIBRARIES} tsl::robin_map)
-
-# gmm
-# find_package(Open3D REQUIRED)  
-# include_directories(${Open3D_INCLUDE_DIR} src/test/gmm)
-
-# add_library(${PROJECT_NAME}.gmm src/test/gmm/GMMFit.cpp)
-# target_link_libraries(${PROJECT_NAME}.gmm ${gs_libs} Open3D::Open3D)
-
-# add_executable(
-#   ${PROJECT_NAME}_test_gmm
-#   src/test/test_gmm.cpp
-# )
-# target_link_libraries(${PROJECT_NAME}_test_gmm  ${PROJECT_NAME}.gmm )
-
-# eclipse
-# find_package(Open3D REQUIRED)  
-# include_directories(${Open3D_INCLUDE_DIR})
-
-# add_executable(
-#   ${PROJECT_NAME}_test_ecli
-#   src/test/test_ecli.cpp
-# )
-# target_link_libraries(${PROJECT_NAME}_test_ecli ${gs_libs} Open3D::Open3D )
-
-# hash
-# add_executable(
-#   ${PROJECT_NAME}_test_hash
-#   src/test/test_hash.cpp
-# )
-
-# target_link_libraries(${PROJECT_NAME}_test_hash  pthread)
+target_link_libraries(livo_node 
+    ${CERES_LIBRARIES} 
+    ${OpenCV_LIBRARIES} 
+    # ${PCL_LIBRARIES}
+    ${catkin_LIBRARIES}
+    # ${Boost_LIBRARIES}
+    ${PROJECT_NAME}.common 
+    ${PROJECT_NAME}.gs 
+    ${PROJECT_NAME}.gp3d 
+    Threads::Threads
+)

@@ -1,6 +1,5 @@
 #include "liw/lioOptimization.h"
 
-#include <cnpy.h>
 #include <algorithm>
 #include "gs/loss_utils.cuh"
 
@@ -2135,17 +2134,6 @@ cv::Mat lioOptimization::tensor2CvMat3X(torch::Tensor& tensor) {
   return imgbinrgb;
 }
 
-void lioOptimization::saveDepthMapAsNPY(torch::Tensor& tensor, const std::string& filename) {
-  tensor = tensor.to(torch::kFloat32).detach().cpu();
-  cv::Mat depthMap(tensor.size(0), tensor.size(1), CV_32F, tensor.data_ptr<float>());
-
-  // Convert cv::Mat to std::vector<float>
-  std::vector<float> depthData(depthMap.begin<float>(), depthMap.end<float>());
-
-  // Save to npy file
-  cnpy::npy_save(
-      filename, &depthData[0], {static_cast<size_t>(depthMap.rows), static_cast<size_t>(depthMap.cols)}, "w");
-}
 
 cv::Mat lioOptimization::tensor2CvMat2X(torch::Tensor& tensor, float maxDepth) {
   tensor = tensor.to(torch::kFloat32).detach().cpu();

@@ -10,11 +10,6 @@
 #include "general_utils.cuh"
 #include "parameters.cuh"
 #include "sh_utils.cuh"
-
-#include <pcl/io/ply_io.h>
-
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
 #include <tinyply.h>
 
 #include <gp3d/gp_types.h>
