@@ -349,36 +349,36 @@ void transformAllImuPoint(
   }
 }
 
-bool projectPointToImage(
-    const Eigen::Vector3d& point,
-    Eigen::Vector3<uint8_t>& rgb,
-    const cv::Mat& image,
-    double& fx,
-    double& fy,
-    double& cx,
-    double& cy) {
-  double Xc = point(0);
-  double Yc = point(1);
-  double Zc = point(2);
+// bool projectPointToImage(
+//     const Eigen::Vector3d& point,
+//     Eigen::Vector3<uint8_t>& rgb,
+//     const cv::Mat& image,
+//     double& fx,
+//     double& fy,
+//     double& cx,
+//     double& cy) {
+//   double Xc = point(0);
+//   double Yc = point(1);
+//   double Zc = point(2);
 
-  // 2. Project point to normalized image plane
-  double x_prime = Xc / Zc;
-  double y_prime = Yc / Zc;
+//   // 2. Project point to normalized image plane
+//   double x_prime = Xc / Zc;
+//   double y_prime = Yc / Zc;
 
-  int u = static_cast<int>(fx * x_prime + cx);
-  int v = static_cast<int>(fy * y_prime + cy);
+//   int u = static_cast<int>(fx * x_prime + cx);
+//   int v = static_cast<int>(fy * y_prime + cy);
 
-  if (u >= 0 && u < image.cols && v >= 0 && v < image.rows) {
+//   if (u >= 0 && u < image.cols && v >= 0 && v < image.rows) {
 
-    cv::Vec3b pixel = image.at<cv::Vec3b>(v, u);
+//     cv::Vec3b pixel = image.at<cv::Vec3b>(v, u);
 
-    rgb = Eigen::Vector3<uint8_t>(
-        static_cast<uint8_t>(pixel[0]), static_cast<uint8_t>(pixel[1]), static_cast<uint8_t>(pixel[2]));
-    return true;
-  } else {
-    return false;
-  }
-}
+//     rgb = Eigen::Vector3<uint8_t>(
+//         static_cast<uint8_t>(pixel[0]), static_cast<uint8_t>(pixel[1]), static_cast<uint8_t>(pixel[2]));
+//     return true;
+//   } else {
+//     return false;
+//   }
+// }
 
 float rgbToGrayscale(uint8_t r, uint8_t g, uint8_t b) {
   return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0;

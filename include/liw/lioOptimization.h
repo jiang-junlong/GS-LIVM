@@ -43,7 +43,7 @@
 #include <pcl_ros/point_cloud.h>
 
 // livox
-#include <livox_ros_driver2/CustomMsg.h>
+#include <livox_ros_driver/CustomMsg.h>
 
 #include "liw/cloudMap.h"
 
@@ -382,7 +382,7 @@ class lioOptimization {
   // initialize class
 
   // get sensor data
-  void livoxHandler(const livox_ros_driver2::CustomMsg::ConstPtr& msg);
+  void livoxHandler(const livox_ros_driver::CustomMsg::ConstPtr& msg);
 
   void standardCloudHandler(const sensor_msgs::PointCloud2::ConstPtr& msg);
 

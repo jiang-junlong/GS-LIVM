@@ -117,7 +117,7 @@ void cloudProcessing::process(const sensor_msgs::PointCloud2::ConstPtr& msg, Thr
 }
 
 void cloudProcessing::livoxHandler(
-    const livox_ros_driver2::CustomMsg::ConstPtr& msg,
+    const livox_ros_driver::CustomMsg::ConstPtr& msg,
     ThreadSafeQueue<point3D>& point_buffer) {
   int plsize = msg->point_num;
   static double tm_scale = 1e9;

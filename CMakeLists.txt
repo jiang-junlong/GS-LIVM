@@ -18,7 +18,8 @@ else()
 endif()
 
 set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -G -lineinfo --expt-relaxed-constexpr --expt-extended-lambda")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -lineinfo --expt-relaxed-constexpr --expt-extended-lambda")
+# set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -G -lineinfo --expt-relaxed-constexpr --expt-extended-lambda")
 
 option(USE_LIVOX "option for livox" ON)
 if(USE_LIVOX)
@@ -34,10 +35,9 @@ if(USE_LIVOX)
     sensor_msgs
     std_msgs
     tf
-    livox_ros_driver2
     cv_bridge
   )
-  else()
+else()
   set(PACKAGE_XML_PATH ${CMAKE_CURRENT_SOURCE_DIR}/package.xml)
   find_package(catkin REQUIRED COMPONENTS
     eigen_conversions
@@ -64,7 +64,7 @@ find_package(Ceres REQUIRED)
 find_package(OpenCV REQUIRED)
 
 find_package(Sophus REQUIRED)
-find_package(tsl-robin-map REQUIRED)
+# find_package(tsl-robin-map REQUIRED)
 
 if(BUILD_GS)
   enable_language(CUDA)
@@ -97,7 +97,7 @@ include_directories(
   ${PCL_INCLUDE_DIRS}
   ${SOPHUS_INCLUDE_DIR}
   ${OpenCV_INCLUDE_DIRS}
-  ${tsl-robin-map_INCLUDE_DIRS}
+  # ${tsl-robin-map_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/external/tinyply/source
   ${PYTHON_INCLUDE_DIRS}
 )
@@ -111,7 +111,7 @@ add_library(${PROJECT_NAME}.common
 )
 
 if(BUILD_GS)
-  set(Torch_DIR /home/jiang/envs/libtorch-cu118/share/cmake/Torch)
+  set(Torch_DIR /home/jiang/envs/libtorch/share/cmake/Torch)
   find_package(Torch REQUIRED)
   add_subdirectory(external) # 编译一些外部库
 

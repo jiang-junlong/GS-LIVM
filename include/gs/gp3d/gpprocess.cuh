@@ -101,7 +101,7 @@ class gpProcess : torch::nn::Module {
       std::vector<GSLIVM::GsForMap>& final_gs_sample,
       std::vector<GSLIVM::GsForLoss>& final_gs_calc_loss);
 
-  void backward(torch::Tensor init);
+  // void backward(torch::Tensor init);
 
   bool
   projectPointsToImage(const std::vector<Eigen::Vector3d>& points_incam, std::vector<DColor>& colors, cv::Mat& frame);
@@ -135,6 +135,7 @@ class gpProcess : torch::nn::Module {
   std::vector<DVoxel> all_d_data;
   std::mutex mutex_added_final_gs_sample_insert;
   std::unordered_set<std::size_t> added_final_gs_sample;
+  char* d_all_voxels_data_pool;
 };
 
 #endif

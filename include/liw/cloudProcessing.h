@@ -18,7 +18,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 
 // livox
-#include <livox_ros_driver2/CustomMsg.h>
+#include <livox_ros_driver/CustomMsg.h>
 
 #include "liw/cloudMap.h"
 
@@ -173,5 +173,5 @@ class cloudProcessing {
 
   void printfFieldName(const sensor_msgs::PointCloud2::ConstPtr& msg);
 
-  void livoxHandler(const livox_ros_driver2::CustomMsg::ConstPtr& msg, ThreadSafeQueue<point3D>& point_buffer);
+  void livoxHandler(const livox_ros_driver::CustomMsg::ConstPtr& msg, ThreadSafeQueue<point3D>& point_buffer);
 };

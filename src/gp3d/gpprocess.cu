@@ -319,6 +319,7 @@ void gpProcess::copyDataArrayToGPU(DVoxel* h_voxels, DVoxel*& d_voxels, int num_
       &d_total_memory,
       total_points_size + total_global_train_points_size + total_global_points_testm_size + total_ky_size +
           total_k_starm_size + total_kky_size + total_f_starm_size + total_k_variance_size);
+  this->d_all_voxels_data_pool = d_total_memory;  // ! added
 
   char* d_current_ptr = d_total_memory;
   DVoxel* d_tmp_voxels = new DVoxel[num_voxels];
@@ -508,6 +509,7 @@ void gpProcess::forward_gp3d(
     std::vector<GSLIVM::GsForMap>& final_gs_sample,
     std::vector<GSLIVM::GsForLoss>& final_gs_calc_loss) {
   int num_voxels = data.size();
+  // all_d_data.resize(num_voxels); // !
 
   DVoxel* h_voxels;
   common::Timer::Evaluate(
@@ -894,19 +896,33 @@ void gpProcess::forward_gp3d(
 
           cudaMemcpy(&all_d_data[voxel_index], &d_voxels[voxel_index], sizeof(DVoxel), cudaMemcpyDeviceToHost);
 
-          CHECK_CUDA(cudaFree(all_d_data[voxel_index].points), gp_options_.debug);
-          CHECK_CUDA(cudaFree(all_d_data[voxel_index].global_train_x_points), gp_options_.debug);
-          CHECK_CUDA(cudaFree(all_d_data[voxel_index].global_train_y_points), gp_options_.debug);
-          CHECK_CUDA(cudaFree(all_d_data[voxel_index].global_train_f_points), gp_options_.debug);
-          CHECK_CUDA(cudaFree(all_d_data[voxel_index].global_train_points_variance), gp_options_.debug);
-          CHECK_CUDA(cudaFree(all_d_data[voxel_index].ky), gp_options_.debug);
-          CHECK_CUDA(cudaFree(all_d_data[voxel_index].k_starm), gp_options_.debug);
-          CHECK_CUDA(cudaFree(all_d_data[voxel_index].kky), gp_options_.debug);
+          // CHECK_CUDA(cudaFree(all_d_data[voxel_index].points), gp_options_.debug);
+          // CHECK_CUDA(cudaFree(all_d_data[voxel_index].global_train_x_points), gp_options_.debug);
+          // CHECK_CUDA(cudaFree(all_d_data[voxel_index].global_train_y_points), gp_options_.debug);
+          // CHECK_CUDA(cudaFree(all_d_data[voxel_index].global_train_f_points), gp_options_.debug);
+          // CHECK_CUDA(cudaFree(all_d_data[voxel_index].global_train_points_variance), gp_options_.debug);
+          // CHECK_CUDA(cudaFree(all_d_data[voxel_index].ky), gp_options_.debug);
+          // CHECK_CUDA(cudaFree(all_d_data[voxel_index].k_starm), gp_options_.debug);
+          // CHECK_CUDA(cudaFree(all_d_data[voxel_index].kky), gp_options_.debug);
 
-          CHECK_CUDA(cudaFree(all_d_data[voxel_index].global_points_testm), gp_options_.debug);
+          // CHECK_CUDA(cudaFree(all_d_data[voxel_index].global_points_testm), gp_options_.debug);
 
-          CHECK_CUDA(cudaFree(all_d_data[voxel_index].f_starm), gp_options_.debug);
-          CHECK_CUDA(cudaFree(all_d_data[voxel_index].k_variance), gp_options_.debug);
+          // CHECK_CUDA(cudaFree(all_d_data[voxel_index].f_starm), gp_options_.debug);
+          // CHECK_CUDA(cudaFree(all_d_data[voxel_index].k_variance), gp_options_.debug);
+        }
+        // 1. 先确保 GPU 活干完了
+        cudaError_t sync_err = cudaDeviceSynchronize();
+        if (sync_err != cudaSuccess) {
+          std::cout << "Before free, GPU error: " << cudaGetErrorString(sync_err) << std::endl;
+        }
+        // 3. 释放 GPU 大池子
+        if (this->d_all_voxels_data_pool != nullptr) {
+          cudaError_t err = cudaFree(this->d_all_voxels_data_pool);
+          if (err != cudaSuccess) {
+            std::cout << "cudaFree Pool Failed: " << cudaGetErrorString(err) << std::endl;
+          }
+          this->d_all_voxels_data_pool = nullptr;
+          // std::cout << "GPU Pool Freed Successfully" << std::endl;
         }
         CHECK_CUDA(cudaFree(d_voxels), gp_options_.debug);
         delete[] h_voxels;
@@ -917,7 +933,6 @@ void gpProcess::forward_gp3d(
   if (err != cudaSuccess) {
     printf("CUDA kernel launch error: %s\n", cudaGetErrorString(err));
   }
-  
 }
 
 bool gpProcess::getColors(

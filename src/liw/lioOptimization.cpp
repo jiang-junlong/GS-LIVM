@@ -220,7 +220,7 @@ lioOptimization::lioOptimization() {
   }
 
   if (cloud_pro->getLidarType() == LIVOX)
-    sub_cloud_ori = nh.subscribe<livox_ros_driver2::CustomMsg>(lidar_topic, 20, &lioOptimization::livoxHandler, this);
+    sub_cloud_ori = nh.subscribe<livox_ros_driver::CustomMsg>(lidar_topic, 20, &lioOptimization::livoxHandler, this);
   else
     sub_cloud_ori =
         nh.subscribe<sensor_msgs::PointCloud2>(lidar_topic, 20, &lioOptimization::standardCloudHandler, this);
@@ -306,6 +306,10 @@ void lioOptimization::readParameters() {
 
   nh.param<double>("camera_parameter/image_resize_ratio", para_double, -1.0);
   img_pro->setImageRatio(para_double);
+  // ! added
+  image_width_verify = int(image_width_verify * para_double);
+  image_height_verify = int(image_height_verify * para_double);
+  
   nh.param<std::vector<double>>("camera_parameter/camera_intrinsic", v_camera_intrinsic, std::vector<double>());
   nh.param<std::vector<double>>("camera_parameter/camera_dist_coeffs", v_camera_dist_coeffs, std::vector<double>());
 
@@ -747,7 +751,7 @@ void lioOptimization::standardCloudHandler(const sensor_msgs::PointCloud2::Const
   last_time_lidar = msg->header.stamp.toSec();
 }
 
-void lioOptimization::livoxHandler(const livox_ros_driver2::CustomMsg::ConstPtr& msg) {
+void lioOptimization::livoxHandler(const livox_ros_driver::CustomMsg::ConstPtr& msg) {
   assert(msg->header.stamp.toSec() > last_time_lidar);
 
   cloud_pro->livoxHandler(msg, point_buffer);
@@ -802,7 +806,7 @@ void lioOptimization::imageHandler(const sensor_msgs::ImageConstPtr& msg) {
 
   ImageTs img_ts;
   img_ts.image = image;
-  img_ts.timestamp = msg->header.stamp.toSec();
+  img_ts.timestamp = msg->header.stamp.toSec() + 0.1; // ! added
   time_img_buffer.push(img_ts);
 
   assert(msg->header.stamp.toSec() > last_time_img);

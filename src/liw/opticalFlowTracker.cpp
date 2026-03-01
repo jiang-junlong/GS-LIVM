@@ -271,7 +271,7 @@ bool opticalFlowTracker::removeOutlierUsingRansacPnp(cloudFrame* p_frame, int if
     points_2d.push_back(it->second);
   }
 
-  if (points_3d.size() < 4) {
+  if (points_3d.size() < 6) {
     return false;
   }
 

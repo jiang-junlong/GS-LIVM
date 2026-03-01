@@ -17,7 +17,7 @@
 #include <pcl_ros/point_cloud.h>
 
 // livox
-#include <livox_ros_driver2/CustomMsg.h>
+#include <livox_ros_driver/CustomMsg.h>
 
 // cloud processing
 #include "liw/cloudProcessing.h"
@@ -397,14 +397,5 @@ void transformAllImuPoint(
     std::vector<imuState>& imu_states,
     Eigen::Matrix3d& R_imu_lidar,
     Eigen::Vector3d& t_imu_lidar);
-
-bool projectPointToImage(
-    const Eigen::Vector3d& point,
-    Eigen::Vector3<uint8_t>& rgb,
-    const cv::Mat& image,
-    double& fx,
-    double& fy,
-    double& cx,
-    double& cy);
 
 float rgbToGrayscale(uint8_t r, uint8_t g, uint8_t b);

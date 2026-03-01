@@ -37,7 +37,7 @@ class OptimizationParameters {
 
 struct ModelParameters {
   int sh_degree = 0;
-  std::filesystem::path output_path = "/home/xieys/projects/gslivo_ws/output";
+  std::filesystem::path output_path = "/home/jiang/catkin_ws/src/GS-LIVM/output";
   std::string images = "images";
   int resolution = -1;
   bool white_background = true;

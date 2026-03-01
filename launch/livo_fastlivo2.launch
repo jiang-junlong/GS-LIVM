@@ -1,0 +1,18 @@
+<launch>
+  <!-- Launch file for velodyne16 VLP-16 LiDAR -->
+    <rosparam command="load" file="$(find gslivm)/config/fastlivo2.yaml" />
+    <rosparam command="load" file="$(find gslivm)/config/basic_common.yaml" />
+
+    <param name="debug_output" type="bool" value="0"/>
+    <param name="output_path" type="string" value="$(find gslivm)/output"/>
+    <node pkg="gslivm" type="livo_node" name="livo_node" output="screen"/> 
+
+    <arg name="bag_path" value="/home/jiang/rosbag/Retail_Street.bag" />
+
+    <node pkg="rosbag" type="play" name="player" output="screen" args="-q -d 3 $(arg bag_path)"/>
+    
+    <param name="bag_path" value="$(arg bag_path)"/>
+    <node pkg="gslivm" name="odom_listener" type="listen_odom.py"  output="screen" />
+</launch>
+
+
